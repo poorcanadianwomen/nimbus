@@ -517,9 +517,9 @@ int main(int argc, char* argv[]) {
     for (const int size : {16, 22, 24, 32, 48, 64, 128, 256, 512}) {
         appIcon.addFile(QStringLiteral(":/icons/app/nimbus-%1.png").arg(size), QSize(size, size));
     }
-    // An SVG fallback for a build that somehow lacks the PNGs, so a missing resource
-    // degrades to a plain icon rather than no icon at all.
-    if (appIcon.isNull()) appIcon.addFile(QStringLiteral(":/icons/app/stoat.svg"));
+    // A missing resource now means no icon at all rather than a vector placeholder.
+    // There is deliberately no fallback: the old one was a different picture, so a
+    // broken build showed an icon that did not match the app it was meant to be.
     app.setWindowIcon(appIcon);
 
     QCommandLineParser parser;

@@ -58,7 +58,6 @@
     <file alias="home.svg">icons/material/home.svg</file>
   </qresource>
   <qresource prefix="/icons/app">
-    <file alias="stoat.svg">icons/app/stoat.svg</file>
     <file alias="nimbus-16.png">icons/app/nimbus-16.png</file>
     <file alias="nimbus-22.png">icons/app/nimbus-22.png</file>
     <file alias="nimbus-24.png">icons/app/nimbus-24.png</file>
