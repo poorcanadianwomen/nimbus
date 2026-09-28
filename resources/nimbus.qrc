@@ -1,0 +1,63 @@
+<RCC>
+  <qresource prefix="/icons/tabler">
+    <file alias="alert-circle.svg">icons/tabler/alert-circle.svg</file>
+    <file alias="arrow-up.svg">icons/tabler/arrow-up.svg</file>
+    <file alias="at.svg">icons/tabler/at.svg</file>
+    <file alias="bell-off.svg">icons/tabler/bell-off.svg</file>
+    <file alias="bell-ringing.svg">icons/tabler/bell-ringing.svg</file>
+    <file alias="bell.svg">icons/tabler/bell.svg</file>
+    <file alias="calendar.svg">icons/tabler/calendar.svg</file>
+    <file alias="check.svg">icons/tabler/check.svg</file>
+    <file alias="chevron-down.svg">icons/tabler/chevron-down.svg</file>
+    <file alias="chevron-right.svg">icons/tabler/chevron-right.svg</file>
+    <file alias="circle-x.svg">icons/tabler/circle-x.svg</file>
+    <file alias="clock.svg">icons/tabler/clock.svg</file>
+    <file alias="corner-down-left.svg">icons/tabler/corner-down-left.svg</file>
+    <file alias="corner-up-left.svg">icons/tabler/corner-up-left.svg</file>
+    <file alias="dots.svg">icons/tabler/dots.svg</file>
+    <file alias="download.svg">icons/tabler/download.svg</file>
+    <file alias="edit.svg">icons/tabler/edit.svg</file>
+    <file alias="eye-off.svg">icons/tabler/eye-off.svg</file>
+    <file alias="eye.svg">icons/tabler/eye.svg</file>
+    <file alias="file-text.svg">icons/tabler/file-text.svg</file>
+    <file alias="hash.svg">icons/tabler/hash.svg</file>
+    <file alias="home.svg">icons/tabler/home.svg</file>
+    <file alias="info-circle.svg">icons/tabler/info-circle.svg</file>
+    <file alias="letter-case.svg">icons/tabler/letter-case.svg</file>
+    <file alias="lock-open.svg">icons/tabler/lock-open.svg</file>
+    <file alias="lock.svg">icons/tabler/lock.svg</file>
+    <file alias="login.svg">icons/tabler/login.svg</file>
+    <file alias="logout.svg">icons/tabler/logout.svg</file>
+    <file alias="minimize.svg">icons/tabler/minimize.svg</file>
+    <file alias="mood-smile.svg">icons/tabler/mood-smile.svg</file>
+    <file alias="moon.svg">icons/tabler/moon.svg</file>
+    <file alias="paperclip.svg">icons/tabler/paperclip.svg</file>
+    <file alias="pencil.svg">icons/tabler/pencil.svg</file>
+    <file alias="photo.svg">icons/tabler/photo.svg</file>
+    <file alias="pin.svg">icons/tabler/pin.svg</file>
+    <file alias="plus.svg">icons/tabler/plus.svg</file>
+    <file alias="report.svg">icons/tabler/report.svg</file>
+    <file alias="search.svg">icons/tabler/search.svg</file>
+    <file alias="send.svg">icons/tabler/send.svg</file>
+    <file alias="settings.svg">icons/tabler/settings.svg</file>
+    <file alias="share.svg">icons/tabler/share.svg</file>
+    <file alias="shield-lock.svg">icons/tabler/shield-lock.svg</file>
+    <file alias="sparkles.svg">icons/tabler/sparkles.svg</file>
+    <file alias="sun.svg">icons/tabler/sun.svg</file>
+    <file alias="trash-x.svg">icons/tabler/trash-x.svg</file>
+    <file alias="trash.svg">icons/tabler/trash.svg</file>
+    <file alias="typography.svg">icons/tabler/typography.svg</file>
+    <file alias="user-plus.svg">icons/tabler/user-plus.svg</file>
+    <file alias="user.svg">icons/tabler/user.svg</file>
+    <file alias="video.svg">icons/tabler/video.svg</file>
+    <file alias="volume.svg">icons/tabler/volume.svg</file>
+    <file alias="x.svg">icons/tabler/x.svg</file>
+  </qresource>
+  <qresource prefix="/icons/material">
+    <file alias="send.svg">icons/material/send.svg</file>
+    <file alias="home.svg">icons/material/home.svg</file>
+  </qresource>
+  <qresource prefix="/icons/app">
+    <file alias="stoat.svg">icons/app/stoat.svg</file>
+  </qresource>
+</RCC>

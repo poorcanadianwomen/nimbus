@@ -1,0 +1,31 @@
+# Build trees. Both are generated, and build-asan in particular is a hazard rather
+# than just disk usage: it leaves a running binary that no current source produced.
+build/
+build-asan/
+_deps/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+install_manifest.txt
+compile_commands.json
+
+# Unrelated build noise. install.log is written by the Spicetify installer, not by
+# this project, and turned up in the project root.
+install.log
+
+# Editors and tooling
+.vscode/
+.idea/
+.cache/
+*.swp
+*~
+.DS_Store
+
+# Screenshots written by the render tests. The tests put them here so the look can be
+# inspected; they are outputs, not sources.
+/*.png
+nimbus-*.png
