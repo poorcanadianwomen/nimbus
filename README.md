@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="resources/icons/app/nimbus-256.png" alt="nimbus" width="180">
+</p>
+
 # nimbus
 
 Linux Stoat client implemented in C++20 using Qt6 and CMake.
