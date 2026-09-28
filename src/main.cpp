@@ -509,9 +509,17 @@ int main(int argc, char* argv[]) {
     app.setApplicationName(QStringLiteral("nimbus"));
     app.setApplicationVersion(QStringLiteral("0.1.0"));
     app.setOrganizationName(QStringLiteral("nimbus"));
-    // The window and the tray share one icon. Set on the application as well as the
-    // windows, or the taskbar falls back to a generic placeholder.
-    const QIcon appIcon(QStringLiteral(":/icons/app/stoat.svg"));
+    // The window and the tray share one icon, built from the size set so the taskbar
+    // and the tray each get a native-resolution bitmap rather than one bitmap scaled
+    // down from 256. Set on the application as well as the windows, or the taskbar
+    // falls back to a generic placeholder.
+    QIcon appIcon;
+    for (const int size : {16, 22, 24, 32, 48, 64, 128, 256, 512}) {
+        appIcon.addFile(QStringLiteral(":/icons/app/nimbus-%1.png").arg(size), QSize(size, size));
+    }
+    // An SVG fallback for a build that somehow lacks the PNGs, so a missing resource
+    // degrades to a plain icon rather than no icon at all.
+    if (appIcon.isNull()) appIcon.addFile(QStringLiteral(":/icons/app/stoat.svg"));
     app.setWindowIcon(appIcon);
 
     QCommandLineParser parser;

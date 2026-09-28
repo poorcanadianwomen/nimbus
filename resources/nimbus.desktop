@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=nimbus
+GenericName=Stoat Client
+Comment=A Stoat client for Linux
+Exec=nimbus %U
+Icon=nimbus
+Terminal=false
+Categories=Network;InstantMessaging;Chat;
+Keywords=stoat;chat;im;messages;
+StartupNotify=true
+StartupWMClass=nimbus

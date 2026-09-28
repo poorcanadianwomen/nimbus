@@ -25,7 +25,7 @@ install.log
 *~
 .DS_Store
 
-# Screenshots written by the render tests. The tests put them here so the look can be
-# inspected; they are outputs, not sources.
-/*.png
-nimbus-*.png
+# Screenshots written by the render tests. The tests write them to /tmp, but they land
+# here when someone opens one from a build. Root-anchored: an unanchored
+# "nimbus-*.png" also swallows resources/icons/app/nimbus-*.png, which are sources.
+/nimbus-*.png

@@ -59,5 +59,14 @@
   </qresource>
   <qresource prefix="/icons/app">
     <file alias="stoat.svg">icons/app/stoat.svg</file>
+    <file alias="nimbus-16.png">icons/app/nimbus-16.png</file>
+    <file alias="nimbus-22.png">icons/app/nimbus-22.png</file>
+    <file alias="nimbus-24.png">icons/app/nimbus-24.png</file>
+    <file alias="nimbus-32.png">icons/app/nimbus-32.png</file>
+    <file alias="nimbus-48.png">icons/app/nimbus-48.png</file>
+    <file alias="nimbus-64.png">icons/app/nimbus-64.png</file>
+    <file alias="nimbus-128.png">icons/app/nimbus-128.png</file>
+    <file alias="nimbus-256.png">icons/app/nimbus-256.png</file>
+    <file alias="nimbus-512.png">icons/app/nimbus-512.png</file>
   </qresource>
 </RCC>
