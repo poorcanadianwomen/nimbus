@@ -42,8 +42,7 @@ struct Theme {
     QColor error = QColor("#e06c75");
     QColor success = QColor("#98c379");
 
-    // Proportional sans. Ripcord is not monospaced, and the earlier monospace
-    // default was the single most obviously wrong thing about the old theme.
+    // Proportional sans. Ripcord is not monospaced.
     QFont font;
     QFont fontBold;
 

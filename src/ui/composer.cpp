@@ -86,13 +86,11 @@ Composer::Composer(QWidget* parent)
     // control, and it disappears the moment there is text.
     m_placeholder = nullptr;
 
-    // The send control is a filled mark on a filled button, per the standing rule
-    // that a filled control takes a filled glyph. An outline arrow at 16px on a
-    // solid fill loses its stroke to antialiasing.
-    // Just the arrow. A filled plate behind it was a second box competing with the
-    // field for the same 22 pixels, and it left a light square sitting in the corner
-    // of every window. No background, no border, and no hover fill either: the glyph
-    // brightening is the whole hover treatment.
+    // Just the arrow, on no plate. A filled background would be a second box
+    // competing with the field for the same 22 pixels, and no hover fill either:
+    // the glyph brightening is the whole hover treatment. The mark is filled per the
+    // standing rule -- an outline arrow at 16px on a solid fill loses its stroke to
+    // antialiasing.
     m_send = new QToolButton(this);
     m_send->setObjectName(QStringLiteral("composerSend"));
     m_send->setFixedSize(kSendSize, kSendSize);

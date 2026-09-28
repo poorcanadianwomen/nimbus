@@ -59,8 +59,7 @@ void RailModel::rebuild() {
     const CdnConfig cdn{m_cdnUrl, !m_cdnUrl.isEmpty()};
 
     // The account's own avatar heads the rail, and opening it is how you get to the
-    // direct messages. It used to be the SavedMessages channel drawn as a monogram,
-    // which read as a server called "N" and gave no way to reach the DMs.
+    // direct messages. A monogram here would read as a server called "N".
     if (m_store) {
         const QString selfId = m_store->selfId();
         const User* self = selfId.isEmpty() ? nullptr : m_store->user(selfId);

@@ -250,8 +250,8 @@ void TestShell::test_window_uses_native_decoration() {
     QVERIFY(window->windowFlags() & Qt::WindowTitleHint);
     QCOMPARE(window->windowTitle(), QStringLiteral("nimbus"));
 
-    // The channel name the custom bar used to draw now lives in the window title,
-    // where a window list and a taskbar tooltip can both read it.
+    // The channel name lives in the window title, where a window list and a taskbar
+    // tooltip can both read it.
     window->setStore(store);
     auto* rail = window->findChild<nimbus::ServerRail*>();
     QVERIFY(rail);
@@ -264,12 +264,10 @@ void TestShell::test_window_uses_native_decoration() {
 // Bottom anchoring has to survive a resize: every row re-wraps, the scrollbar's
 // range changes, and the view has to stay pinned to the newest message.
 //
-// This does NOT reproduce the launch segfault. The fix for that is the re-entrancy
-// guard in MessageList::scrollToBottom, and a test that provokes a stack overflow
-// offscreen was not found -- Qt delivers the geometry churn that triggers it
-// differently without a window manager, so the test passes with or without the
-// guard. What this pins down is the behaviour either side of that guard: after
-// repeated resizes of an overflowing transcript, the view is still at the bottom.
+// The re-entrancy guard in MessageList::scrollToBottom is not covered here. Qt
+// delivers the geometry churn that provokes a stack overflow differently without a
+// window manager, so an offscreen test passes with or without it; this pins the
+// behaviour either side of the guard.
 //
 // 90, not 200: ulid() encodes a two-digit suffix, so an index past 99 aliases
 // onto an earlier one and the store silently deduplicates.
@@ -334,8 +332,8 @@ void TestShell::test_resize_keeps_the_transcript_anchored() {
 // whether it can be sent at all are asserted here rather than left to a manual try.
 // A long unbroken token -- a URL is the usual one -- has no break opportunity, so
 // Qt::TextWordWrap leaves it whole and it runs past the edge of the transcript. The
-// fix has to be applied in measure and paint together: they wrap with the same flags,
-// and if they disagree the row is the wrong height for its text.
+// wrapping has to be applied in measure and paint together: they wrap with the same
+// flags, and if they disagree the row is the wrong height for its text.
 void TestShell::test_long_words_wrap_instead_of_overflowing() {
     nimbus::ThemeManager theme;
     nimbus::Store store;
@@ -484,9 +482,8 @@ void TestShell::test_hover_band_spans_the_whole_viewport() {
     model.setChannel(QStringLiteral("01CHANNEL"));
     QCOMPARE(model.rowCount(), 1);
 
-    // A real view, because the fix reads the viewport width off option.widget and a
-    // hand-built option leaves that null -- which is how this test first passed
-    // against code that was still broken.
+    // A real view, because the delegate reads the viewport width off option.widget and
+    // a hand-built option leaves that null.
     nimbus::MessageList list;
     list.setModel(&model);
     list.setStore(&store);
@@ -503,8 +500,8 @@ void TestShell::test_hover_band_spans_the_whole_viewport() {
 
     QStyleOptionViewItem option;
     option.initFrom(&list);
-    // The view hands the delegate its viewport here, and the fix reads the full width
-    // off the parent of that. Set explicitly because initFrom on a bare list does not.
+    // The view hands the delegate its viewport here, and the full width is read off the
+    // parent of that. Set explicitly because initFrom on a bare list does not.
     option.widget = list.viewport();
     QVERIFY(option.widget);
     // What the view passes: the viewport less the two gutters.
@@ -520,8 +517,8 @@ void TestShell::test_hover_band_spans_the_whole_viewport() {
     const QRgb hoverFill = theme.theme().surface.rgb();
     const int mid = kRow / 2;
 
-    // The band has to reach both edges of the viewport. Before the fix it stopped
-    // 12px short of each, which is the gap the pointer appears to tear through.
+    // The band has to reach both edges of the viewport; stopping short leaves the gap
+    // the pointer appears to tear through.
     QCOMPARE(image.pixel(0, mid), hoverFill);
     QCOMPARE(image.pixel(kGutter - 1, mid), hoverFill);
     QCOMPARE(image.pixel(kViewport - 1, mid), hoverFill);
@@ -694,13 +691,9 @@ void TestShell::test_dm_rows_draw_an_avatar_instead_of_a_letter() {
     face.save(QStringLiteral("/tmp/nimbus-dm-face.png"));
 }
 
-// Avatars only render if the model is given a CDN host: File::url() concatenates
-// onto whatever base it is handed, so an unset host yields a relative path that no
-// request can resolve, and every row falls back to a monogram. This is the check
-// that the base actually reaches the models.
-// A reply names the message it replies to. It used to paint the literal word
-// "reply", and the quoted text is frequently not held at all because history is
-// paged -- so both the found and the missing cases are asserted here.
+// A reply names the message it replies to, and the quoted text is frequently not
+// held at all because history is paged -- so both the found and the missing cases are
+// asserted here.
 void TestShell::test_replies_quote_the_message_they_answer() {
     nimbus::ThemeManager theme;
     nimbus::Store store;
@@ -784,6 +777,10 @@ void TestShell::test_replies_quote_the_message_they_answer() {
     replyShot.save(QStringLiteral("/tmp/nimbus-reply.png"));
 }
 
+// Avatars only render if the model is given a CDN host: File::url() concatenates
+// onto whatever base it is handed, so an unset host yields a relative path that no
+// request can resolve, and every row falls back to a monogram. This is the check
+// that the base actually reaches the models.
 void TestShell::test_avatar_urls_are_absolute_once_the_cdn_host_is_known() {
     nimbus::Store store;
     store.setSelfId(QStringLiteral("01SELF"));
@@ -808,7 +805,7 @@ void TestShell::test_avatar_urls_are_absolute_once_the_cdn_host_is_known() {
     QVERIFY(!relative.contains(QStringLiteral("://")));
 
     // The tag is the path variant, so an avatar is /avatars/{id} and an emoji is
-    // /emojis/{id}. The old /attachments/{id}/{tag} shape is 404 for every one.
+    // /emojis/{id}.
     withoutHost.setCdnUrl(QStringLiteral("https://cdn.stoatusercontent.com"));
     QCOMPARE(withoutHost.index(0, 0).data(nimbus::RailModel::IconUrlRole).toString(),
              QStringLiteral("https://cdn.stoatusercontent.com/avatars/01AVATAR"));
@@ -828,20 +825,10 @@ void TestShell::test_avatar_urls_are_absolute_once_the_cdn_host_is_known() {
     QVERIFY(directs.rowCount() >= 1);
 }
 
-// The bar is capped and centred rather than stretched across the window: one line of
-// text on an 850px input is a bad target, and a full-width bar does not line up with
-// the transcript's text column, which stops at the same width.
-// The send control is a bare glyph: no plate, no border, no hover fill. A filled
-// square behind the arrow is invisible in a size assertion and obvious on screen, so
-// this checks the pixels around the icon are the composer's own background.
-// The row is +, field, emoji, gif, send. The plus and the arrow are deliberately not
-// adjacent, so this pins the order as well as the wiring: a bare glyph in the wrong
-// place is a mis-click, not a cosmetic difference.
-// A reaction pill used to print the first six characters of the emoji's ULID, which
-// is what "Oeeee 2" was. With the server's emoji in the store it prints the
-// shortcode, and the pill is measurably wider because ":debian:" is longer than
-// "Oeeee" -- so the width of the pill is the assertion, not a string comparison
-// against text the delegate never hands back.
+// A reaction pill prints the shortcode, resolved through the server's emoji, and is
+// measurably wider than an unresolved id would be because ":debian:" is longer than
+// six characters of ULID -- so the width of the pill is the assertion, not a string
+// comparison against text the delegate never hands back.
 void TestShell::test_reaction_pills_resolve_ids_to_shortcodes() {
     const QString emojiId = QStringLiteral("01EMOJI");
     const QString authorId = QStringLiteral("01OTHER");
@@ -915,6 +902,9 @@ void TestShell::test_reaction_pills_resolve_ids_to_shortcodes() {
                             .arg(with)));
 }
 
+// The row is +, field, emoji, gif, send. The plus and the arrow are deliberately not
+// adjacent, so this pins the order as well as the wiring: a bare glyph in the wrong
+// place is a mis-click, not a cosmetic difference.
 void TestShell::test_composer_row_has_attach_and_send_at_opposite_ends() {
     nimbus::Composer composer;
     composer.resize(500, 28);
@@ -959,6 +949,9 @@ void TestShell::test_composer_row_has_attach_and_send_at_opposite_ends() {
     QVERIFY2(picker->isVisible(), "the emoji control did not open the picker");
 }
 
+// The send control is a bare glyph: no plate, no border, no hover fill. A filled
+// square behind the arrow is invisible in a size assertion and obvious on screen, so
+// this checks the pixels around the icon are the composer's own background.
 void TestShell::test_send_control_is_a_bare_glyph() {
     nimbus::ThemeManager theme;
     nimbus::Composer composer;
@@ -1003,6 +996,9 @@ void TestShell::test_send_control_is_a_bare_glyph() {
     QVERIFY2(inside.size() > 2, "the send glyph was not drawn");
 }
 
+// The bar is capped and centred rather than stretched across the window: one line of
+// text on an 850px input is a bad target, and a full-width bar does not line up with
+// the transcript's text column, which stops at the same width.
 void TestShell::test_text_bar_is_capped_and_centred() {
     nimbus::Composer composer;
     composer.setChannel(QStringLiteral("01CHANNEL"));
@@ -1175,9 +1171,8 @@ void TestShell::test_rail_has_home_servers_and_channels() {
              int(nimbus::RailKind::Home));
 }
 
-// The rail's top entry is the account, not the notes channel. It used to be a
-// monogram labelled "Notes", which read as a server called N and offered no route
-// to the direct messages.
+// The rail's top entry is the account, not the notes channel: a monogram labelled
+// "Notes" reads as a server called N and offers no route to the direct messages.
 void TestShell::test_rail_head_is_your_own_account() {
     auto* store = buildStore(this);
     nimbus::RailModel model(store);

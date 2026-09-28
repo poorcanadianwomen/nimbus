@@ -329,9 +329,8 @@ int runClient(nimbus::App& client, const QIcon& appIcon) {
                          login->activateWindow();
                      });
 
-    // The tray. Parented to the application so it outlives every window: with no
-    // window of its own, closing the client with the X used to be the only way out,
-    // and on a tray setup that leaves a process nothing can reach.
+    // The tray. Parented to the application so it outlives every window, which on a
+    // tray setup is the only thing left to bring the client back.
     auto* tray = new QSystemTrayIcon(appIcon, qApp);
     tray->setToolTip(QStringLiteral("nimbus"));
 
@@ -517,9 +516,8 @@ int main(int argc, char* argv[]) {
     for (const int size : {16, 22, 24, 32, 48, 64, 128, 256, 512}) {
         appIcon.addFile(QStringLiteral(":/icons/app/nimbus-%1.png").arg(size), QSize(size, size));
     }
-    // A missing resource now means no icon at all rather than a vector placeholder.
-    // There is deliberately no fallback: the old one was a different picture, so a
-    // broken build showed an icon that did not match the app it was meant to be.
+    // Deliberately no fallback: a vector placeholder is a different picture, so a
+    // missing resource would show an icon that does not match the app.
     app.setWindowIcon(appIcon);
 
     QCommandLineParser parser;

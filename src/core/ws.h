@@ -19,11 +19,10 @@ QByteArray maskFramePayload(const QByteArray& data, const QByteArray& key);
 // RFC 6455 client over TLS, written against QSslSocket because Qt ships no
 // WebSocket implementation that can be pointed at an arbitrary TLS socket.
 //
-// Compression is deliberately not offered. The handshake below used to advertise
-// permessage-deflate while the frame decoder had no inflater at all, which is
-// harmless against a server that declines and silently corrupts every message
-// against one that accepts. rsv1 being set on an inbound frame is therefore
-// treated as a protocol error rather than ignored.
+// Compression is deliberately not offered and the handshake never advertises it: the
+// frame decoder has no inflater, so a server that accepted permessage-deflate would
+// corrupt every message. rsv1 set on an inbound frame is therefore a protocol error
+// rather than a bit to ignore.
 class WebSocket : public QObject {
     Q_OBJECT
 public:

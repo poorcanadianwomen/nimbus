@@ -321,8 +321,7 @@ void TestFormat::test_trigger_term_and_range() {
 
 void TestFormat::test_trigger_follows_the_word_it_is_typing() {
     // Every caret position in "@maple" is the same token being typed, so the popup
-    // stays open and the term grows with it. It used to be rejected mid-word, which
-    // meant it only appeared once the word was finished -- the opposite of useful.
+    // stays open and the term grows with it rather than waiting for the word to end.
     const QString text = QStringLiteral("@maple");
     for (int caret = 2; caret <= text.size(); ++caret) {
         const auto match = nimbus::triggerAt(text, caret);

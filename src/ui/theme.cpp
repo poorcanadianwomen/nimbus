@@ -25,8 +25,7 @@ QStringList sansFamilies() {
 QFont buildFont(int pointSize, QFont::Weight weight) {
     QFont font;
     // setFamilies rather than setFamilyName: a single name that is not installed
-    // silently falls back to whatever the platform prefers, which is how the old
-    // theme ended up rendering in a font nobody chose.
+    // silently falls back to whatever the platform prefers.
     font.setFamilies(sansFamilies());
     font.setPointSize(pointSize);
     font.setWeight(weight);

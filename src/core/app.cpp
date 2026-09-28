@@ -408,9 +408,8 @@ void App::dispatch(const QString& type, const QJsonObject& frame) {
         const bool add = type == QLatin1String("MessageReact");
 
         // Null means we do not hold that message -- a different channel, or one the
-        // transcript cap trimmed -- and there is nothing to update. The old guard
-        // tested message.id.isEmpty() *after* copying, which is a dereference of the
-        // null pointer and a crash rather than a check.
+        // transcript cap trimmed -- and there is nothing to update. Test the pointer
+        // itself, not the id on whatever it points at.
         const Message* stored = m_store.message(channelId, messageId);
         if (!stored) return;
 
@@ -759,9 +758,8 @@ void App::fetchEmojis(const QString& serverId) {
             qDebug() << "app: emoji fetch failed:" << response.errorMessage();
             return;
         }
-        // Stored, not discarded. The response used to be dropped here, so every
-        // reaction pill had nothing to resolve its id against and fell back to
-        // printing the first six characters of the id.
+        // Stored, not discarded: a reaction pill is drawn from an emoji id, so without
+        // this there is nothing to resolve one against.
         int kept = 0;
         for (const QJsonValue& value : response.array()) {
             if (!value.isObject()) continue;

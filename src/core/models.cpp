@@ -13,9 +13,7 @@ namespace {
 QString cdnPath(const File& f) {
     // /{tag}/{id}, where tag is the variant: avatars, attachments, emojis, icons,
     // backgrounds, banners. Verified against the live CDN -- the server rejects an
-    // unknown variant with a 400 that lists them. This used to be built as
-    // /attachments/{id}/{tag}, which is 404 for every variant, which is why no
-    // avatar was ever fetched and every row fell back to a monogram.
+    // unknown variant with a 400 that lists them, and any other ordering is a 404.
     if (f.id.isEmpty() || f.tag.isEmpty()) return {};
     return QStringLiteral("/%1/%2").arg(f.tag, f.id);
 }

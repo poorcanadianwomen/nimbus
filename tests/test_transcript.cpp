@@ -110,8 +110,7 @@ void TestTranscript::test_row_actually_paints() {
     m_delegate->paint(&painter, option, index);
     painter.end();
 
-    // The old delegate had an empty paint() and a constant sizeHint; both
-    // assertions below are the ones that would have caught it.
+    // Both of these are what an empty paint() and a constant sizeHint would fail.
     QVERIFY(option.rect.height() > 20);
     QVERIFY2(paintedPixels(image, background) > 200,
              "a transcript row that paints no pixels looks identical to a correct one");
@@ -262,10 +261,10 @@ void TestTranscript::test_reactions_extend_the_row() {
     QVERIFY2(after > before, "reaction pills need a row of their own or they paint over the text");
 }
 
-// The transcript draws no avatars. It used to, in a 42px gutter that every row was
-// indented past -- so removing the avatar without removing the gutter would have
-// left the text stranded in an empty column. This pins both halves: nothing is
-// painted where an avatar was, and the text starts at the left edge.
+// The transcript draws no avatars and reserves no gutter for them -- an avatar
+// without a gutter or a gutter without an avatar both leave the text stranded in an
+// empty column. This pins both halves: nothing is painted where an avatar would be,
+// and the text starts at the left edge.
 void TestTranscript::test_transcript_draws_no_avatar_and_no_gutter() {
     m_store->upsertMessage(makeMessage(m_channelId, ulid('u'), QStringLiteral("flush left")));
 
@@ -290,8 +289,7 @@ void TestTranscript::test_transcript_draws_no_avatar_and_no_gutter() {
         }
     }
 
-    // And nothing is left sitting in the gutter the avatar used to occupy, so the
-    // row's text has to start near the left edge rather than at the old indent.
+    // And the text starts near the left edge, since nothing is painted in front of it.
     const QRgb background = m_theme->theme().base.rgb();
     int firstInked = image.width();
     for (int x = 0; x < image.width() && firstInked == image.width(); ++x) {

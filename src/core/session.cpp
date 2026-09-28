@@ -64,11 +64,8 @@ QString accountPath() {
 } // namespace
 
 QString SessionStore::path() {
-    // Overridable, and the test suite sets it. The round-trip test used to run
-    // against this default path, which meant every `nimbus-exec test` deleted the
-    // real credential and left a dummy behind -- so the client appeared to forget
-    // its account at random, and the only cure was logging in again. It also gives
-    // a second profile a home without touching the primary one.
+    // Overridable, and the test suite sets it. Also gives a second profile a home
+    // without touching the primary one.
     return sessionPath();
 }
 

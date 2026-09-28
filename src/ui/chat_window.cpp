@@ -272,9 +272,8 @@ void ChatWindow::openChannel(const QString& channelId) {
 
     const Channel* channel = m_store ? m_store->channel(channelId) : nullptr;
     if (channel && !channel->name.isEmpty()) {
-        // The native title bar carries this now, so the marker is spelled out
-        // rather than drawn: "#general" is unambiguous where the row's "#" glyph
-        // was not, and a taskbar tooltip or window list has no glyph to draw it.
+        // The marker is spelled out rather than drawn as a glyph, because a taskbar
+        // tooltip and a window list both read the title and neither draws one.
         const QString marker =
             channel->type == ChannelType::TextChannel ? QStringLiteral("#") : QString();
         setWindowTitle(marker + channel->name);

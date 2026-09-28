@@ -75,9 +75,7 @@ public:
                       const QStringList& users);
 
     // --- emoji ---
-    // Reactions arrive as emoji ids, so a pill cannot be drawn without this, and
-    // fetchEmojis used to throw the response away, which is why they all read
-    // "Oeeee 2" -- the first six characters of the id.
+    // Reactions arrive as emoji ids, so a pill cannot be drawn without this.
     void upsertEmoji(const Emoji& emoji);
     const Emoji* emoji(const QString& id) const;
     // Sorted by name, so the picker does not reshuffle between openings.

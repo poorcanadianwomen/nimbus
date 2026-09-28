@@ -62,9 +62,7 @@ void installLogHandler(LogLevel level) {
         const QString location = QString("%1:%2 %3").arg(file).arg(line, -4).arg(func);
 
         // Padded with leftJustified rather than a printf-style %-30s: QString::arg
-        // does not understand width specifiers, so the old format left a literal
-        // %-30s behind and emitted a qWarning from inside the message handler on
-        // every single line.
+        // does not understand width specifiers and would leave the literal behind.
         const QString out = QStringLiteral("%1 %2 %3 %4")
                                 .arg(timestamp, levelToStr(lvl), location.leftJustified(30), msg);
 
