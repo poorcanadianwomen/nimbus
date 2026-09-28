@@ -1,246 +1,539 @@
 # nimbus
 
-A [Stoat](https://stoat.chat) client for Linux, in C++20 with Qt6 and CMake.
+Linux Stoat client implemented in C++20 using Qt6 and CMake.
 
-Three panes: the account and your servers on the left, the channel or conversation
-list in the middle, the transcript on the right. Dark, compact, and built to stay
-out of the way.
+The interface consists of three primary areas:
 
-## Signing in
+1. Account and server navigation
+2. Channel and conversation navigation
+3. Message transcript
 
-```sh
+## Signing In
+
+Run:
+
+```
 nimbus
 ```
 
-With no stored session the app opens a sign-in form — an email address, a password,
-and a button. On success the session token is written to `~/.config/nimbus/session`
-with mode `0600`, and every launch after that goes straight to the client. There is
-no token to paste and no account menu to find.
+If no valid session exists, the application displays the authentication form.
 
-The last-used address is kept in `~/.config/nimbus/account` so the form can prefill
-it. The password is never stored anywhere.
+Authentication requires:
 
-If the stored session is later rejected, the client returns to the form with the
-reason rather than opening an empty window.
-
-Headless equivalents:
-
-```sh
-nimbus --login     # prompts on stdin, saves the session
-nimbus --logout    # deletes the stored session
+```
+Email address
+Password
 ```
 
-`$NIMBUS_SESSION_FILE` relocates both `session` and `account`. That is how the test
-suite avoids touching real credentials, and how you would run a second profile.
+After successful authentication, the session token is stored at:
+
+```
+~/.config/nimbus/session
+```
+
+The session file is created with permission mode `0600`.
+
+Subsequent launches use the stored session automatically.
+
+The last used email address is stored at:
+
+```
+~/.config/nimbus/account
+```
+
+The password is not stored.
+
+If the stored session is rejected, the authentication form is displayed with the corresponding failure reason.
+
+Headless authentication:
+
+```
+nimbus --login
+```
+
+Headless logout:
+
+```
+nimbus --logout
+```
+
+`$NIMBUS_SESSION_FILE` overrides the default session and account storage location. This variable is used by the test environment and can also be used to create independent profiles.
 
 ## Building
 
 ### Requirements
 
-| | Version | Notes |
-| --- | --- | --- |
-| CMake | 3.24 or newer | 3.24 is what `CMakeLists.txt` asks for |
-| A C++20 compiler | GCC 12+, Clang 15+ | `CMAKE_CXX_STANDARD 20` is required, not optional |
-| Qt | **6.4 or newer** | `Core`, `Network`, `Gui`, `Widgets`, `Svg`, and `Test` for the suites |
+CMake 3.24 or newer
 
-nlohmann/json is fetched by CMake at configure time, so **the first configure needs
-network access**. Nothing else is vendored.
+C++20 compiler
 
-On Debian and Ubuntu:
+GCC 12 or newer
 
-```sh
+Clang 15 or newer
+
+Qt 6.4 or newer
+
+Required Qt modules:
+
+```
+Core
+Network
+Gui
+Widgets
+Svg
+Test
+```
+
+`nlohmann/json` is downloaded by CMake during the initial configuration. Network access is therefore required during the first configuration.
+
+Debian and Ubuntu dependency installation:
+
+```
 sudo apt install cmake g++ qt6-base-dev qt6-svg-dev
 ```
 
-Note the two Qt packages: the base module and the SVG module are separate. If CMake
-stops at `Could not find a package configuration file provided by "Qt6"`, the Svg
-module is the one you are missing.
+`qt6-base-dev` provides the primary Qt modules. `qt6-svg-dev` provides the SVG module.
 
-### The four commands
+### Build Procedure
 
-```sh
-# 1. configure
+Configure:
+
+```
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+```
 
-# 2. build
+Build:
+
+```
 cmake --build build -j"$(nproc)"
+```
 
-# 3. test -- optional, and off by default in a plain configure
+Run tests:
+
+```
 ctest --test-dir build --output-on-failure
+```
 
-# 4. run
+Launch:
+
+```
 ./build/bin/nimbus
 ```
 
-A clean build takes about **70 seconds** on eight cores, most of it the shell
-suites, which compile the UI several times over because each suite is its own
-executable with its own `main`.
+Ninja can be selected with:
 
-Add `-GNinja` to the configure line if you prefer it; there is nothing in the
-project that depends on Make.
-
-### Options
-
-| Option | Default | What it does |
-| --- | --- | --- |
-| `NIMBUS_BUILD_TESTS` | `ON` | Build the seven test suites. Turn it `OFF` to cut build time roughly in half — the app itself does not need them |
-| `NIMBUS_WERROR` | `OFF` | Treat warnings as errors. The project builds warning-free; turn this on in CI |
-| `CMAKE_BUILD_TYPE` | unset | `Release`, `Debug`, or `RelWithDebInfo`. Unset means no optimisation flags at all, which is not what you want for a build you intend to run |
-
-### Or use the executor
-
-`nimbus-exec` is the supported entry point for development and wraps the same
-commands:
-
-```sh
-nimbus-exec            # clean, build, test
-nimbus-exec build      # build only
-nimbus-exec test       # the seven suites, offscreen
-nimbus-exec clean      # remove both build trees
+```
+cmake -S . -B build -GNinja -DCMAKE_BUILD_TYPE=Release
 ```
 
-It always configures `NIMBUS_BUILD_TESTS=ON`, because the tree it builds is the
-tree it tests. A launcher that configured tests off could produce a build you could
-not test, which is the failure mode the executor exists to prevent.
+A clean build on an eight core system requires approximately 70 seconds. Test executables account for most of the build time.
 
-### Installing the `nimbus` command
+## CMake Options
 
-Optional. `scripts/nimbus-launch.sh` is the `nimbus` command, and it is a symlink
-rather than a copy, so it keeps working when the script changes:
+`NIMBUS_BUILD_TESTS`
 
-```sh
+Default: `ON`
+
+Builds the seven test suites. Setting this option to `OFF` reduces build time. The application does not require the test executables.
+
+`NIMBUS_WERROR`
+
+Default: `OFF`
+
+Converts compiler warnings into errors.
+
+`CMAKE_BUILD_TYPE`
+
+Default: unset
+
+Supported values include:
+
+```
+Release
+Debug
+RelWithDebInfo
+```
+
+For normal application builds, `Release` is recommended.
+
+## nimbus exec
+
+`nimbus exec` is the development build entry point.
+
+```
+nimbus exec
+nimbus exec build
+nimbus exec test
+nimbus exec clean
+```
+
+The default command performs a clean build and test operation.
+
+`build` performs the build operation.
+
+`test` executes the seven test suites in offscreen mode.
+
+`clean` removes the build trees.
+
+The executor always enables `NIMBUS_BUILD_TESTS`. The generated build therefore corresponds to the tree used for testing.
+
+## Installing the nimbus Command
+
+The launcher is located at:
+
+```
+scripts/nimbus-launch.sh
+```
+
+Create the command symlink with:
+
+```
 ln -s "$PWD/scripts/nimbus-launch.sh" ~/.local/bin/nimbus
 ```
 
-It builds on demand and then runs the app, and it handles no credentials — the
-session is the app's business. Without it, run `./build/bin/nimbus` directly.
+The launcher builds the application when required and starts the executable.
 
-### When a build goes wrong
+Authentication state is managed by the application and not by the launcher.
 
-**`Could not find a package configuration file provided by "Qt6"`** — a Qt module is
-missing. Check the five above; `qt6-svg-dev` is the one people miss.
+The application can also be started directly:
 
-**Configure tries to download nlohmann/json and fails** — the first configure needs
-network. Once `_deps/` is populated, later configures are offline.
+```
+./build/bin/nimbus
+```
 
-**`nimbus` command not found** — the symlink is not in a directory on `PATH`, or the
-build tree moved. `~/.local/bin` is on `PATH` on most Debian systems.
+## Build Diagnostics
 
-**The app opens and immediately exits** — run it from a terminal to see why. With no
-stored session it opens the sign-in form and waits; that is expected, not a crash.
+Qt6 package configuration failure:
 
-## Command line
+```
+Could not find a package configuration file provided by "Qt6"
+```
 
-| Flag | What it does |
-| --- | --- |
-| *(none)* | Launch the client |
-| `--login` | Prompt for email and password, save the session |
-| `--logout` | Delete the stored session |
-| `--watch [seconds]` | Connect, report state changes, and print a summary |
-| `--selftest` | End-to-end write check against your own Notes channel |
-| `--verbose` | Debug-level logging |
-| `--trace` | Trace-level logging |
-| `--api <url>` | Override the API base (default `https://api.stoat.chat`) |
+Verify that the required Qt modules are installed, including `qt6-svg-dev`.
 
-## What works
+Dependency download failure for `nlohmann/json` indicates that the initial CMake configuration does not have network access.
 
-- **Sign in**, with the session remembered across launches.
-- **Servers** in the rail, headed by your own avatar. Direct channels are not in the
-  rail; they are behind the avatar, which lists them newest first.
-- **Channels** grouped by category, with mention badges.
-- **Transcripts** with author names, replies quoting the message they answer,
-  reactions rendering the server's actual emote images, and link previews as cards.
-- **Sending**, editing, deleting, pinning, and file attachments uploaded to the CDN.
-- **An emoji picker** over the server's emotes, resolved to real images by id.
-- **A single-line composer** capped and centred to line up with the transcript's text
-  column, with attach, emoji, GIF and send controls.
-- **A tray icon** that raises the client, with Show and Quit.
+`nimbus` command not found indicates that `~/.local/bin` is not present in `PATH` or that the project directory used by the symlink no longer exists.
 
-## Not done yet
+Immediate application termination should be investigated from a terminal. With no stored session, the expected behavior is display of the authentication form.
 
-Honest list, so you know what you are looking at:
+## Command Line Interface
 
-- **Live messages are dropped.** `MessageAppend` is unhandled, so a channel you have
-  open does not update when someone posts. This is the most visible gap.
-- **Message formatting is parsed but not yet rendered.** `> ` quotes, `||spoiler||`,
-  code, `:name:` emotes and `<@id>` mentions are parsed into spans and tested
-  (`tests/test_format.cpp`); painting them needs a real text layout in the delegate.
-  Until that lands the transcript draws message text plainly.
-- **The GIF control is a placeholder** with a tooltip that says so.
-- **MFA is not implemented.** An account that requires it is told so.
-- **No member list, search, or pins view.**
-- **Empty messages are sent as attachments.** Triggering a send from `+` has no body.
+No argument
+
+Launches the client.
+
+`--login`
+
+Reads an email address and password from standard input and stores the resulting session.
+
+`--logout`
+
+Deletes the stored session.
+
+`--watch [seconds]`
+
+Connects to the service, reports state changes, and prints a summary.
+
+`--selftest`
+
+Performs an end to end write operation against the user's Notes channel.
+
+`--verbose`
+
+Enables debug logging.
+
+`--trace`
+
+Enables trace logging.
+
+`--api <url>`
+
+Overrides the API base URL.
+
+Default:
+
+```
+https://api.stoat.chat
+```
+
+## Implemented Functionality
+
+Authentication with persistent session storage.
+
+Server navigation with account avatar.
+
+Direct channel navigation through the account interface.
+
+Channel grouping by category.
+
+Mention indicators.
+
+Message transcripts.
+
+Author names.
+
+Reply rendering.
+
+Reaction rendering using server emote images.
+
+Link preview cards.
+
+Message creation.
+
+Message editing.
+
+Message deletion.
+
+Message pinning.
+
+File attachments uploaded to the CDN.
+
+Server emote picker.
+
+Single line message composer.
+
+Attachment controls.
+
+Emoji controls.
+
+GIF control.
+
+Send control.
+
+System tray integration.
+
+Tray actions:
+
+```
+Show
+Quit
+```
+
+## Incomplete Functionality
+
+Live message updates are not implemented. `MessageAppend` is currently unhandled.
+
+Message formatting is parsed but is not rendered using the final text layout system.
+
+Supported parsed formatting includes:
+
+```
+> quotes
+||spoilers||
+code
+:name: emotes
+<@id> mentions
+```
+
+Formatting parsing is covered by `tests/test_format.cpp`.
+
+The transcript currently renders message text without the parsed formatting styles.
+
+The GIF control is a placeholder.
+
+MFA authentication is not implemented.
+
+Accounts requiring MFA are rejected with an appropriate status.
+
+Member list functionality is not implemented.
+
+Message search is not implemented.
+
+Dedicated pins view is not implemented.
+
+Sending an empty message through the `+` action produces an attachment request without message body content.
 
 ## Tests
 
-Seven suites, 102 checks, all offscreen:
+The project contains seven test suites with 102 checks.
 
-| Suite | What it covers |
-| --- | --- |
-| `nimbus_tests` | Core: parsing, the store, sessions, event frames |
-| `nimbus_format_tests` | Message syntax: quotes, code, spoilers, emotes, mentions |
-| `nimbus_layout_tests` | Transcript geometry against real painted glyphs |
-| `nimbus_shell_tests` | The three panes, the composer, embeds, reaction pills |
-| `nimbus_login_tests` | The sign-in form |
-| `nimbus_icon_tests` | The icon pipeline, by counting pixels |
-| `nimbus_motion_tests` | Reduce-motion behaviour |
+`nimbus_tests`
 
-Anything that renders is asserted on real pixels. A layout test that never blits a
-glyph proves nothing, so the delegate suites count non-background pixels and compare
-measured heights against painted ones.
+Core parsing, storage, sessions, and gateway event frames.
+
+`nimbus_format_tests`
+
+Message syntax parsing including quotes, code, spoilers, emotes, and mentions.
+
+`nimbus_layout_tests`
+
+Transcript geometry and rendered glyph measurements.
+
+`nimbus_shell_tests`
+
+Three pane interface, composer, embeds, and reaction components.
+
+`nimbus_login_tests`
+
+Authentication interface.
+
+`nimbus_icon_tests`
+
+Icon rendering pipeline and pixel validation.
+
+`nimbus_motion_tests`
+
+Reduced motion behavior.
+
+Rendering tests operate on actual generated pixels.
+
+Layout validation measures rendered glyph output and compares the resulting dimensions with expected geometry.
 
 ## Architecture
 
+Project structure:
+
 ```
 src/
-  main.cpp            CLI, and the window the auth state selects
-  core/
-    app.*             Owns the transport, the REST client, the cache and the session
-    events.*          The gateway connection and frame dispatch
-    rest.*            REST with per-route buckets, 429 retries, multipart upload
-    ws.*              RFC 6455 client over TLS
-    store.*           In-memory servers, channels, messages, unreads, emoji
-    models.*          Payload to model parsing
-    session.*         The stored credential
-  ui/
-    chat_window.*     The three panes, and what opens when
-    server_rail.*     The account and the servers
-    channel_list.*    Channels by category, or the direct messages
-    message_list.*    Scroll-anchored transcript
-    message_delegate.*  One message row: names, replies, emotes, embeds, reactions
-    message_format.*  Message syntax into spans
-    composer.*        The message input
-    emoji_picker.*    The server's emotes
-    avatar_cache.*    Authenticated CDN images, capped in memory and on disk
-    theme.*           One palette
+    main.cpp
+    core/
+        app.*
+        events.*
+        rest.*
+        ws.*
+        store.*
+        models.*
+        session.*
+    ui/
+        chat_window.*
+        server_rail.*
+        channel_list.*
+        message_list.*
+        message_delegate.*
+        message_format.*
+        composer.*
+        emoji_picker.*
+        avatar_cache.*
+        theme.*
 ```
 
-`App` owns the transport and the store. The UI binds to `App` and nothing below it.
+`main.cpp`
 
-### The gateway
+Command line interface and authentication state selection.
 
-Details that are easy to get wrong, and are covered by tests:
+`core/app.*`
 
-- Frames are **binary** and carry a **zlib-wrapped** deflate stream.
-- The stream is **per connection, not per message**: only the first frame carries the
-  `0x78` header.
-- Each message ends with a **sync flush**, so `Z_STREAM_END` never arrives and a
-  decoder that waits for it discards every frame.
-- **Outbound messages are left uncompressed.** Only the inbound direction is
-  compressed; sending a wrapped stream earned an immediate decoding error.
-- Authentication is a **query parameter** on the socket URL, not a frame.
+Owns transport, REST client, cache, and session state.
+
+`core/events.*`
+
+Gateway connection and event frame dispatch.
+
+`core/rest.*`
+
+REST implementation with route specific rate limiting, HTTP 429 retry handling, and multipart uploads.
+
+`core/ws.*`
+
+RFC 6455 WebSocket client over TLS.
+
+`core/store.*`
+
+In memory servers, channels, messages, unread state, and emoji data.
+
+`core/models.*`
+
+Payload parsing and model construction.
+
+`core/session.*`
+
+Persistent credential storage.
+
+`ui/chat_window.*`
+
+Primary three pane interface.
+
+`ui/server_rail.*`
+
+Account and server navigation.
+
+`ui/channel_list.*`
+
+Channel categories and direct messages.
+
+`ui/message_list.*`
+
+Scroll anchored transcript.
+
+`ui/message_delegate.*`
+
+Message rendering including authors, replies, emotes, embeds, and reactions.
+
+`ui/message_format.*`
+
+Message syntax parsing.
+
+`ui/composer.*`
+
+Message input interface.
+
+`ui/emoji_picker.*`
+
+Server emote selection.
+
+`ui/avatar_cache.*`
+
+Authenticated CDN image cache with memory and disk limits.
+
+`ui/theme.*`
+
+Application palette.
+
+`App` owns the transport and application store. UI components bind to `App` and do not directly access lower level transport components.
+
+## Gateway Protocol
+
+Gateway frames are binary.
+
+Incoming frames contain a zlib wrapped deflate stream.
+
+Compression state is maintained per connection rather than per message.
+
+Only the first compressed frame contains the `0x78` header.
+
+Messages terminate with a synchronization flush. `Z_STREAM_END` is therefore not expected at the end of each message.
+
+Outbound messages are not compressed.
+
+Only the inbound direction uses compression.
+
+Authentication is provided as a query parameter in the WebSocket URL.
+
+These behaviors are covered by gateway tests.
 
 ## Security
 
-The session token lives at `~/.config/nimbus/session`, mode `0600`. It is a bearer
-credential: anyone holding it acts as the account. It is never logged, never printed
-by the tests, and never committed.
+The session token is stored at:
 
-`SessionStore::path()` honours `$NIMBUS_SESSION_FILE`, and the core suite sets it to
-a temporary directory. That override is load-bearing: the session round-trip test
-used to run against the real path, so every test run deleted the credential. If you
-add a test that touches `SessionStore`, set the override and assert it took effect
-before writing anything.
+```
+~/.config/nimbus/session
+```
 
-The last-used email is kept separately at `~/.config/nimbus/account`. It is an
-address, not a credential, and exists only to prefill the form.
+File permission:
+
+```
+0600
+```
+
+The session token is a bearer credential. Possession of the token provides account access.
+
+The token is not logged.
+
+The token is not printed by the test suite.
+
+The token is not committed to the repository.
+
+`SessionStore::path()` supports `$NIMBUS_SESSION_FILE`.
+
+The core test suite assigns the session path to a temporary directory to prevent access to the user's real credential.
+
+Tests involving `SessionStore` must set the session path override before performing filesystem operations.
+
+The account address is stored independently at:
+
+```
+~/.config/nimbus/account
+```
+
+The account file contains the email address used to prefill authentication. It does not contain authentication credentials.
